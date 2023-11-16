@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -10,47 +11,40 @@ namespace String_to_Expression
 
 		static void Main(string[] args)
 		{
-			//Put down values to be replaced
-			int length = 4;
-			int width = 2;
-			int height = 3;
+			StringToExpressionGenerator();
+		}
 
-			//Formula to replace
-			string additionFormula = "length * length * height";
-
-
-			//Create a dictionary containing variables to replace with
-			//The foreach loop will check if the formula has the keys, then the keys will be replaced with the value
-			Dictionary<string, string> variablesToReplaceWith = new Dictionary<string, string>
+		static void StringToExpressionGenerator()
+		{
+			ArrayList primedVariables = variablePrimer();
+			Dictionary<string, string> variablesToReplaceWith = (Dictionary<string, string>)primedVariables[0];
+			Dictionary<string, string> formulaDictionary = (Dictionary<string, string>)primedVariables[1];
+			Dictionary<string, string> completedFormulaDictionary = ExpressionConverter(StringVariableReplacer(variablesToReplaceWith, formulaDictionary));
+			foreach(var s in completedFormulaDictionary) 
 			{
-				{ "length", length.ToString() },
-				{ "width", width.ToString() },
-				{ "height", height.ToString() }
+				Console.WriteLine(s.Key + " / " + s.Value);
+			}
+		}
+
+		static ArrayList variablePrimer()
+		{
+			Dictionary<string, string> sampleVariablesToReplaceWith = new Dictionary<string, string>
+			{
+				{ "length", "4" },
+				{ "width", "20" },
+				{ "height", "6" }
 			};
-
-			//Place the formula into a string to be used
-			string resultingString = additionFormula;
-			
-			//Converts the new formula string into an actual mathematical expression and returns a result		
-			//double result = Convert.ToDouble(new DataTable().Compute(resultingString, null));
-
-			//Prints the result
-			//Console.WriteLine(resultingString + " = " + result);
-
-			Dictionary<string, string> sampleFormulaDictionary = new Dictionary<string, string>() 
+			Dictionary<string, string> sampleFormulaDictionary = new Dictionary<string, string>()
 			{
 				{ "Length by Length", "length * length" },
 				{ "Width by Width", "width * width" },
 				{ "Length by Width by Height", "length * width * height" }
 			};
-			Dictionary<string, string> output = StringVariableReplacer(variablesToReplaceWith, sampleFormulaDictionary);
-			
-			foreach (var keyValuePair in output){
-				Console.WriteLine(keyValuePair.Key + " / " + keyValuePair.Value);
-			}
+
+			return new ArrayList() { sampleVariablesToReplaceWith, sampleFormulaDictionary };
 		}
-		
-		public static Dictionary<string,string> StringVariableReplacer(Dictionary<string, string> variablesToReplaceWith, Dictionary<string, string> FormulaDictionary)
+	
+		static Dictionary<string,string> StringVariableReplacer(Dictionary<string, string> variablesToReplaceWith, Dictionary<string, string> FormulaDictionary)
 		{
 			Dictionary<string, string> newFormulaDictionary = new Dictionary<string, string>();
 			foreach (var formula in FormulaDictionary)
@@ -62,7 +56,6 @@ namespace String_to_Expression
 					{
 						try 
 						{
-							Console.WriteLine("{0} found in {1}", s.Key, newFormula);
 							newFormula = newFormula.Replace(s.Key, variablesToReplaceWith[s.Key]);	
 						}
 						catch (IndexOutOfRangeException e) { Console.WriteLine(e.Message + "\n" + formula.Key); }
@@ -75,6 +68,15 @@ namespace String_to_Expression
 			return newFormulaDictionary;
 		}
 
-		
+		static Dictionary<string, string> ExpressionConverter(Dictionary<string, string> newFormulaDictionary)
+		{
+			Dictionary<string, string> completedValueDictionary = new Dictionary<string, string>();
+			foreach(var formula in newFormulaDictionary)
+			{
+				String result = (Convert.ToDouble(new DataTable().Compute(formula.Value, null))).ToString();
+				completedValueDictionary.Add(formula.Key, result);
+			}
+			return completedValueDictionary;
+		}
 	}
 }
