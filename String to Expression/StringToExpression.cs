@@ -2,7 +2,7 @@
 using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
-
+using System.Security;
 
 namespace String_to_Expression
 {
@@ -11,21 +11,25 @@ namespace String_to_Expression
 
 		static void Main(string[] args)
 		{
-			StringToExpressionGenerator();
-		}
-
-		static void StringToExpressionGenerator()
-		{
-			ArrayList primedVariables = variablePrimer();
-			Dictionary<string, string> variablesToReplaceWith = (Dictionary<string, string>)primedVariables[0];
-			Dictionary<string, string> formulaDictionary = (Dictionary<string, string>)primedVariables[1];
-			Dictionary<string, string> completedFormulaDictionary = ExpressionConverter(StringVariableReplacer(variablesToReplaceWith, formulaDictionary));
-			foreach(var s in completedFormulaDictionary) 
+			Dictionary<string, string> completedFormulaDictionary = StringToExpressionGenerator();
+			foreach (var s in completedFormulaDictionary)
 			{
 				Console.WriteLine(s.Key + " / " + s.Value);
 			}
 		}
 
+//Call this method to generate a completed Dictionary from the values and formulas given in the variablePrimer() method
+		static Dictionary<string, string> StringToExpressionGenerator()
+		{
+			ArrayList primedVariables = variablePrimer();
+			Dictionary<string, string> variablesToReplaceWith = (Dictionary<string, string>)primedVariables[0];
+			Dictionary<string, string> formulaDictionary = (Dictionary<string, string>)primedVariables[1];
+			Dictionary<string, string> completedFormulaDictionary = ExpressionConverter(StringVariableReplacer(variablesToReplaceWith, formulaDictionary));
+			return completedFormulaDictionary;
+			
+		}
+
+//Values place the values and formulas here
 		static ArrayList variablePrimer()
 		{
 			Dictionary<string, string> sampleVariablesToReplaceWith = new Dictionary<string, string>
