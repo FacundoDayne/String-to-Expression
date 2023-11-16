@@ -44,43 +44,31 @@ namespace String_to_Expression
 				{ "Length by Width by Height", "length * width * height" }
 			};
 			Dictionary<string, string> output = StringVariableReplacer(variablesToReplaceWith, sampleFormulaDictionary);
-
 			
-			Console.WriteLine("After");
 			foreach (var keyValuePair in output){
 				Console.WriteLine(keyValuePair.Key + " / " + keyValuePair.Value);
 			}
 		}
-
 		
 		public static Dictionary<string,string> StringVariableReplacer(Dictionary<string, string> variablesToReplaceWith, Dictionary<string, string> FormulaDictionary)
 		{
 			Dictionary<string, string> newFormulaDictionary = new Dictionary<string, string>();
 			foreach (var formula in FormulaDictionary)
 			{
-
+				String newFormula = formula.Value;
 				foreach (var s in variablesToReplaceWith)
 				{
-					String newFormula = "";
-					//Checks if the variable is in the formula
-					if (formula.Value.IndexOf(s.Key) != -1)
+					if (newFormula.IndexOf(s.Key) != -1)
 					{
-						//Replaces the variable with an actual value
 						try 
 						{
-							Console.WriteLine("{0} found in {1}", s.Key, formula.Value);
-							String newFormula = formula.Value.Replace(s.Key, variablesToReplaceWith[s.Key]);
-							if (newFormulaDictionary.ContainsKey(formula.Key))
-							{
-								newFormulaDictionary[formula.Key] = newFormula;
-							}
-							else
-							{
-								newFormulaDictionary.Add(formula.Key, newFormula);
-							}
+							Console.WriteLine("{0} found in {1}", s.Key, newFormula);
+							newFormula = newFormula.Replace(s.Key, variablesToReplaceWith[s.Key]);	
 						}
 						catch (IndexOutOfRangeException e) { Console.WriteLine(e.Message + "\n" + formula.Key); }
 					}
+					if (newFormulaDictionary.ContainsKey(formula.Key)) newFormulaDictionary[formula.Key] = newFormula;
+					else newFormulaDictionary.Add(formula.Key, newFormula);
 
 				}
 			}
